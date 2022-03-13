@@ -5,9 +5,9 @@ INCLUDE = -I ./
 all : $(TARGET)
 
 A : A.o common.o
-	$(CC) -o A A.o common.o
+	$(CC) -o A A.o common.o -lpthread
 B : B.o common.o
-	$(CC) -o B B.o common.o
+	$(CC) -o B B.o common.o -lpthread
 
 common.o : common.c
 	$(CC) -o $@ -c $< $(INCLUDE)

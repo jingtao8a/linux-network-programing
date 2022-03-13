@@ -8,24 +8,10 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#define TEXT_SIZE 1024
+extern int createmsgid();
 
-struct msgbuf{
-	long mtype;
-	char mtext[TEXT_SIZE];
-};
+extern int msgsend(int msgid, long types, char* buffer);
 
-int createmsgid();
-
-int msgsend(int msgid, long types, const char* buffer);
-
-int msgreceive(int msgid, long types, char *buffer);
+extern int msgreceive(int msgid, long types, char *buffer);
 
 #endif

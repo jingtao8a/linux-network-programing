@@ -6,33 +6,54 @@
  ************************************************************************/
 
 #include "common.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/signal.h>
-int msgid;
+#include <pthread.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <string.h>
+#include <unistd.h>
+static int msgid;
+static int running;
 
-void sigint(int sign)
+static void sigint(int sign)
 {
 	msgctl(msgid, IPC_RMID, NULL);
 	exit(1);
 }
+
+static void* thread(void* arg) {
+	pthread_detach(pthread_self());
+	char buff[1024];
+	while (running) {
+		memset(buff, 0, 1024);
+		msgreceive(msgid, 10, buff);
+		printf("\n\nB say: %s\n", buff);
+		fflush(stdout);
+		if (!strncmp("quit", buff, 4)) {
+			exit(0);
+		}
+		printf("please input:");
+		fflush(stdout);
+	}
+}
+
 int main()
 {
 	signal(SIGINT, sigint);
-	int running = 1;
+	running = 1;
 	msgid = createmsgid();
+	pthread_t t;
+	pthread_create(&t, NULL, thread, NULL);
 	char buff[1024];
 	while (running) {
-		printf("A:");
+		printf("please input:");
 		fflush(stdout);
+		memset(buff, 0, 1024);
 		read(0, buff, 1024);
 		msgsend(msgid, 1, buff);
-
-		printf("B say:");
-		fflush(stdout);
-		msgreceive(msgid, 10, buff);
-		printf("%s", buff);
-		if (strcmp(buff, "q\n") == 0) {
-			break;
-		}
 	}
 	return 0;
 }

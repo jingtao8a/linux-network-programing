@@ -16,11 +16,13 @@
 #include <fcntl.h>
 int running = 1;
 int fd;
+char *path = "./test.txt";
 
 void sigint(int sign)
 {
 	running = 0;
 	close(fd);
+	chmod(path, 777);
 }
 
 
@@ -72,7 +74,7 @@ void* consumer(void *arg)
 
 int main()
 {
-	fd = open("./test.txt", O_CREAT|O_RDWR);
+	fd = open(path, O_CREAT|O_RDWR);
 	signal(SIGINT, sigint);
 	sem_init(&pro, 0, 4);
 	sem_init(&con, 0, 0);
